@@ -43,7 +43,6 @@ export default function createGame(){
             x: playerX,
             y: playerY,
             body: [{x: playerX, y: playerY}],
-            pendingGrowth: 0,
             score: playerSocre
         }
 
@@ -69,6 +68,26 @@ export default function createGame(){
     }
 
     // adicionar fruta
+    function isCellFree(x, y){
+        for (const fruitId in state.fruits){
+            const fruit = state.fruits[fruitId];
+            if(fruit.x === x && fruit.y === y) return false;
+        }
+
+        for(const playerId in state.players){
+            const player = state.players[playerId];
+            if(Array.isArray(player.body)){
+                for(const seg of player.body){
+                    if(seg.x === x && seg.y === y) return false;
+                }
+            }else if (player.x === x && player.y === y){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     function addFruit(command) {
         if(Object.keys(state.fruits).length >= 3){
             return;
@@ -78,6 +97,7 @@ export default function createGame(){
         const fruitX = command ? command.fruitX : Math.floor(Math.random() * state.screen.width);
         const fruitY = command ? command.fruitY : Math.floor(Math.random() * state.screen.height);
 
+        if(!isCellFree(fruitX, fruitY)) return;
 
         state.fruits[fruitId] = {
             x: fruitX,
@@ -161,8 +181,6 @@ export default function createGame(){
             if (!ateFruit) {
                 player.body.pop();
             }
-
-            console.log(state.players[playerId]);
         }
     }
 

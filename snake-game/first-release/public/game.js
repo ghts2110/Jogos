@@ -175,6 +175,11 @@ export default function createGame(){
             player.x = nextPosition.x;
             player.y = nextPosition.y;
 
+            const hitPlayer = hitOtherPlayerAt(nextPosition.x, nextPosition.y);
+            if(!hitPlayer){
+                removePlayer({playerId: playerId});
+            }
+
             player.body.unshift(nextPosition);
 
             const ateFruit = checkForFruitCollisionAt(nextPosition.x, nextPosition.y, playerId);
@@ -196,6 +201,23 @@ export default function createGame(){
             playerId,
             score: player.score,
         });
+    }
+
+    // check cell
+    function hitOtherPlayerAt(x, y){
+        for(const playerId in state.players){
+            const player = state.players[playerId];
+
+            if(Array.isArray(player.body)){
+                for(const seg of player.body){
+                    if(seg.x === x && seg.y === y) return false;
+                }
+            }else if (player.x === x && player.y === y){
+                return false;
+            }
+        }
+
+        return true;
     }
 
     function checkForFruitCollisionAt(x, y, playerId){

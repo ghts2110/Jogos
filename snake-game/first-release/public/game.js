@@ -68,6 +68,10 @@ export default function createGame(){
 
     // adicionar fruta
     function addFruit(command) {
+        if(Object.keys(state.fruits).length >= 3){
+            return;
+        }
+
         const fruitId = command ? command.fruitId : Math.floor(Math.random() * 10000000);
         const fruitX = command ? command.fruitX : Math.floor(Math.random() * state.screen.width);
         const fruitY = command ? command.fruitY : Math.floor(Math.random() * state.screen.height);

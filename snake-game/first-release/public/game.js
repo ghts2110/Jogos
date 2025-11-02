@@ -42,6 +42,8 @@ export default function createGame(){
         state.players[playerId] = {
             x: playerX,
             y: playerY,
+            body: [{x: playerX, y: playerY}],
+            pendingGrowth: 0,
             score: playerSocre
         }
 
@@ -107,29 +109,37 @@ export default function createGame(){
         notifyAll(command);
         
         const acceptedMoves = {
-            ArrowUp(player){
-                player.y -= 1;
-                if(player.y === -1){
-                    player.y = state.screen.height-1;
+            ArrowUp({x, y}){
+                y -= 1;
+                if(y === -1){
+                    y = state.screen.height-1;
                 }
+
+                return {x, y};
             },
-            ArrowRight(player){
-                player.x += 1;
-                if(player.x === state.screen.width){
-                    player.x = 0;
+            ArrowRight({x, y}){
+                x += 1;
+                if(x === state.screen.width){
+                    x = 0;
                 } 
+
+                return {x, y};
             },
-            ArrowDown(player){
-                player.y += 1;
-                if(player.y === state.screen.height){
-                    player.y = 0;
+            ArrowDown({x, y}){
+                y += 1;
+                if(y === state.screen.height){
+                    y = 0;
                 } 
+
+                return {x, y};
             },
-            ArrowLeft(player){
-                player.x -= 1;
-                if(player.x === -1){
-                    player.x = state.screen.width-1;
+            ArrowLeft({x, y}){
+                x -= 1;
+                if(x === -1){
+                    x = state.screen.width-1;
                 } 
+
+                return {x, y};
             }
         }
 
@@ -139,8 +149,20 @@ export default function createGame(){
         const moveFunction = acceptedMoves[keyPressed];
         
         if(player && moveFunction){
-            moveFunction(player);
-            checkForFruitCollision(playerId);
+            const head = player.body[0];
+            const nextPosition = moveFunction({ x: head.x, y: head.y });
+
+            player.x = nextPosition.x;
+            player.y = nextPosition.y;
+
+            player.body.unshift(nextPosition);
+
+            const ateFruit = checkForFruitCollisionAt(nextPosition.x, nextPosition.y, playerId);
+            if (!ateFruit) {
+                player.body.pop();
+            }
+
+            console.log(state.players[playerId]);
         }
     }
 
@@ -158,17 +180,20 @@ export default function createGame(){
         });
     }
 
-    function checkForFruitCollision(playerId){
+    function checkForFruitCollisionAt(x, y, playerId){
         const player = state.players[playerId];
 
         for(const fruitId in state.fruits){
             const fruit = state.fruits[fruitId];
 
-            if(player.x === fruit.x && player.y === fruit.y){
+            if(x === fruit.x && y === fruit.y){
                 addScore(playerId);
                 removeFruit({fruitId: fruitId});
+                return true;
             }
         }
+
+        return false;
     }
 
     return {

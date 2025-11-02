@@ -9,7 +9,9 @@ export function readScreen(screen, game, requestAnimationFrame, currentPlayerId)
     for(const playerId in game.state.players){
         const player = game.state.players[playerId];
         context.fillStyle = 'red';
-        context.fillRect(player.x, player.y, 1, 1);
+        for (const segment of player.body) {
+            context.fillRect(segment.x, segment.y, 1, 1);
+        }
     }
 
     for(const fruitId in game.state.fruits){
@@ -22,7 +24,9 @@ export function readScreen(screen, game, requestAnimationFrame, currentPlayerId)
 
     if(currentPlayer){
         context.fillStyle = '#F0DB4F';
-        context.fillRect(currentPlayer.x, currentPlayer.y, 1, 1);
+        for (const segment of currentPlayer.body) {
+            context.fillRect(segment.x, segment.y, 1, 1);
+        }
     }
 
     requestAnimationFrame(() => {

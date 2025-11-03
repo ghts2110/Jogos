@@ -18,6 +18,7 @@ game.state.screen.height = 20;
 game.subscribe((command) => {
     console.log(`> Emitting ${command.type}`);
     sockets.emit(command.type, command);
+    sockets.emit('state-tick', game.state);
 });
 
 sockets.on('connection', (socket) => {

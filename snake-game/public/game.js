@@ -182,7 +182,7 @@ export default function createGame(){
 
             player.body.unshift(nextPosition);
 
-            const ateFruit = checkForFruitCollisionAt(nextPosition.x, nextPosition.y, playerId);
+            const ateFruit = checkForFruitCollisionAt(playerId);
             if (!ateFruit) {
                 player.body.pop();
             }
@@ -220,13 +220,13 @@ export default function createGame(){
         return true;
     }
 
-    function checkForFruitCollisionAt(x, y, playerId){
+    function checkForFruitCollisionAt(playerId){
         const player = state.players[playerId];
 
         for(const fruitId in state.fruits){
             const fruit = state.fruits[fruitId];
 
-            if(x === fruit.x && y === fruit.y){
+            if(player.x === fruit.x && player.y === fruit.y){
                 addScore(playerId);
                 removeFruit({fruitId: fruitId});
                 return true;
